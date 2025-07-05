@@ -34,13 +34,41 @@ public class InventoryController : MonoBehaviour
         }
     }
 
+    //Add items to the inventory
+    public bool AddItem(GameObject itemPrefab)
+    {   
+        //Run through every slots's position (transform) in inventory
+        foreach(Transform slotTransform in inventoryPanel.transform)
+        {
+            //Get the slot at that position to use their properties: currentItem, transform....
+            Slot slot = slotTransform.GetComponent<Slot>();
+            //If the slot is not null and the slot's currentItem is null = there is no item in the slot
+            if (slot != null && slot.currentItem == null)
+            {
+                //Create a new item in the slot, which is the item we just picked up
+                GameObject newItem = Instantiate(itemPrefab, slot.transform);
+                slot.currentItem = newItem; //Set the slot's current item is the item we just picked up
+                return true; //Return the function is true to show everything went fine
+            }
+        }
+        //Else debug the situation that the inventory is full (there's no slots left).
+        Debug.Log("Inventory's full!");
+        return false;
+    }
+
     // Retrieve all items currently in the inventory slots
     // Returns a list of InventoryItemSaveData for saving
     public List<InventoryItemSaveData> GetInventoryItems()
     {
+        // Validate essential components
+        //Which mean, crate a new Inventory to save the data of the current inventory
+        //By run through every slots in the inventory
         List<InventoryItemSaveData> invData = new List<InventoryItemSaveData>();
         foreach (Transform slotTransform in inventoryPanel.transform)
         {
+            //Get the slot at that position to use their properties: currentItem, transform....
+            //If the slot is not null and the slot's currentItem is not null = there is an item in the slot
+            //Take the item in that slot and add to the new Inventory (which for to use saving the data)
             Slot slot = slotTransform.GetComponent<Slot>();
             if (slot != null && slot.currentItem != null)
             {

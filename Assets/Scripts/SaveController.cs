@@ -8,12 +8,14 @@ public class SaveController : MonoBehaviour
 {
     private string saveLocation;
     private InventoryController inventoryController;
+    private HotBarController hotBarController;
 
     // Initialize save location and find InventoryController
     void Awake()
     {
         saveLocation = Path.Combine(Application.persistentDataPath, "saveData.json");
         inventoryController = FindFirstObjectByType<InventoryController>();
+        hotBarController = FindFirstObjectByType<HotBarController>();
         if (inventoryController == null)
         {
             Debug.LogError("InventoryController is null in SaveController!");
@@ -41,6 +43,7 @@ public class SaveController : MonoBehaviour
             playerPosition = GameObject.FindGameObjectWithTag("Player").transform.position,
             mapBoundary = FindFirstObjectByType<CinemachineConfiner2D>().BoundingShape2D.gameObject.name,
             inventorySaveData = inventoryController.GetInventoryItems() ?? new List<InventoryItemSaveData>(),
+            hotBarSaveData = hotBarController.GetHotBarItems() ?? new List<InventoryItemSaveData>(),
         };
 
         File.WriteAllText(saveLocation, JsonUtility.ToJson(saveData));
@@ -57,27 +60,14 @@ public class SaveController : MonoBehaviour
             GameObject.FindGameObjectWithTag("Player").transform.position = saveData.playerPosition;
 
             FindFirstObjectByType<CinemachineConfiner2D>().BoundingShape2D = GameObject.Find(saveData.mapBoundary).GetComponent<PolygonCollider2D>();
+            //Load Inventory items
+            inventoryController.SetInventoryItems(saveData.inventorySaveData);
+            hotBarController.SetHotBarItems(saveData.hotBarSaveData);
 
-            if (inventoryController != null)
-            {
-                inventoryController.SetInventoryItems(saveData.inventorySaveData);
-            }
-            else
-            {
-                Debug.LogError("Cannot load inventory: InventoryController is null!");
-            }
         }
         else
         {
             SaveGame();
-            if (inventoryController != null)
-            {
-                inventoryController.SetInventoryItems(new List<InventoryItemSaveData>());
-            }
-            else
-            {
-                Debug.LogError("Cannot initialize inventory: InventoryController is null!");
-            }
         }
     }
 }

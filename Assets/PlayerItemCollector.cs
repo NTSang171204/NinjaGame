@@ -13,7 +13,15 @@ public class PlayerItemCollector : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Item"))
         {
-            if ()
+            Item item = collision.GetComponent<Item>();
+            if (item != null) {
+                bool ItemAdded = InventoryController.AddItem(item.gameObject);
+                if (ItemAdded)
+                {
+                    item.OnPickUp();
+                    Destroy(collision.gameObject);
+                }
+            }
         }
     }
 }

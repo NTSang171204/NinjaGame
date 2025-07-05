@@ -11,4 +11,5 @@ public class SaveData
     public string mapBoundary;
 
     public List<InventoryItemSaveData> inventorySaveData;
+    public List<InventoryItemSaveData> hotBarSaveData;
 }
